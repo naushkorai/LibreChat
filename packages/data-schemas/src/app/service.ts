@@ -237,6 +237,7 @@ export const AppService = async (params?: {
     includedTools,
     filters,
     langfuse,
+    traceDestinations: config.traceDestinations,
     messageFilter,
     summarization,
     availableTools,

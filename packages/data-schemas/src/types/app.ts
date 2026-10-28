@@ -89,6 +89,8 @@ export interface AppConfig {
   messageFilter?: TCustomConfig['messageFilter'];
   /** Langfuse tracing configuration */
   langfuse?: TCustomConfig['langfuse'];
+  /** OTLP agent trace destinations such as Mixpanel */
+  traceDestinations?: TCustomConfig['traceDestinations'];
   /** Skill sync configuration */
   skillSync?: SkillSyncConfig;
   /** File storage strategy ('local', 's3', 'firebase', 'azure_blob', 'cloudfront') */

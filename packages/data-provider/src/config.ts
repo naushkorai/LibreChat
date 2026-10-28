@@ -4327,6 +4327,39 @@ export const langfuseConfigSchema = z.object({
 
 export type LangfuseConfig = z.infer<typeof langfuseConfigSchema>;
 
+export const MIXPANEL_REGIONS = ['us', 'eu', 'in'] as const;
+
+/**
+ * Deployment-level destinations that receive agent traces over OTLP/HTTP
+ * protobuf with OpenTelemetry GenAI attributes, with or without Langfuse.
+ * String values support `${ENV_VAR}` interpolation. Temporary chats are never
+ * exported. Prompts, completions and tool payloads stay out unless
+ * `captureContent` is true.
+ */
+export const traceDestinationSchema = z.discriminatedUnion('type', [
+  z
+    .object({
+      type: z.literal('mixpanel'),
+      projectToken: z.string(),
+      region: z.enum(MIXPANEL_REGIONS).optional(),
+      /** Overrides the regional ingestion URL, for proxies and testing. */
+      endpoint: z.string().optional(),
+      captureContent: z.boolean().optional(),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal('otlp'),
+      /** Full OTLP traces URL, used as is. */
+      endpoint: z.string(),
+      headers: z.record(z.string(), z.string()).optional(),
+      captureContent: z.boolean().optional(),
+    })
+    .strict(),
+]);
+
+export type TraceDestinationConfig = z.infer<typeof traceDestinationSchema>;
+
 export const openIdDiscoverySchema = z.object({
   /** Discovery attempts made before startup continues; `0` retries only in the background. */
   startupAttempts: z.number().int().min(0).max(100).default(1),
@@ -4435,6 +4468,7 @@ export const configSchema = z.object({
     .strict()
     .optional(),
   langfuse: langfuseConfigSchema.optional(),
+  traceDestinations: z.array(traceDestinationSchema).optional(),
   credentials: credentialsConfigSchema.optional(),
   memory: memorySchema.optional(),
   summarization: summarizationConfigSchema.optional(),

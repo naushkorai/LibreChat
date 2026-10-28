@@ -14,6 +14,7 @@ import {
 import { normalizeBoolean, resolveLangfuseHeaders, resolveTenantCredentials } from './utils';
 import { buildLangfuseTraceMetadata, resolveLangfuseTraceUserId } from './identity';
 import { resolveLangfuseTenantDestination } from './tenantDestinations';
+import { resolveTraceDestinations } from '~/telemetry/destinations';
 import { scopeHeadersToDestination } from './destinations';
 import { normalizeString } from '~/utils/text';
 import { traceIdForMessage } from './trace';
@@ -291,6 +292,10 @@ export function buildLangfuseConfig({
   }
   if (tags) {
     langfuse.tags = tags;
+  }
+  const otlpDestinations = resolveTraceDestinations(appConfig, isTemporary);
+  if (otlpDestinations) {
+    langfuse.otlpDestinations = otlpDestinations;
   }
 
   if (
